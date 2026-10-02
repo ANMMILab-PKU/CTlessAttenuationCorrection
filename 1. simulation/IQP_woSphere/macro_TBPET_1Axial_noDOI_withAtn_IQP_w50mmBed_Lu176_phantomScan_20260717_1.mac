@@ -1,0 +1,317 @@
+#=====================================================
+# VISU
+#=====================================================
+/vis/disable
+  
+#/vis/open OGLSX
+#/vis/drawVolume
+#/vis/viewer/flush
+#/tracking/storeTrajectory 0
+#/vis/scene/add/trajectories
+#/vis/scene/endOfEventAction accumulate
+## /vis/scene/add/axes
+#/vis/viewer/set/viewpointThetaPhi 0 0
+#/vis/viewer/zoom 1.5
+
+#=====================================================
+# GEOMETRY
+#=====================================================
+/gate/geometry/setMaterialDatabase   /share/home/xzhao/workDir/simulation/data/GateMaterials_newLYSO.db
+
+# LYSO_TB:   d=7.1 g/cm3; n=4 ; state=Solid
+#         +el: name=Lutetium ;  f=0.714467891
+#         +el: name=Yttrium ;   f=0.04033805
+#         +el: name=Silicon;    f=0.063714272
+#         +el: name=Oxygen;     f=0.181479788
+
+#
+#     W O R L D
+#
+/gate/world/geometry/setXLength       900. mm
+/gate/world/geometry/setYLength       900. mm
+/gate/world/geometry/setZLength       300. mm
+
+
+#-------------------oooooOOOOO00000OOOOOooooo---------------------#
+#                                                                 #
+#     D E F I N I T I O N   A N D   D E S C R I T I O N           #
+#        O F   Y O U R   P E T   D E V I C E                      #
+#                                                                 #
+#-------------------oooooOOOOO00000OOOOOooooo---------------------#
+
+#	Define a pet system - PETscanner
+/gate/world/daughters/name				        PETscanner
+/gate/world/daughters/insert				    cylinder
+/gate/PETscanner/setMaterial		    	    Water
+/gate/PETscanner/geometry/setRmax			    440.9 mm # Rmax mm 430.9
+/gate/PETscanner/geometry/setRmin			    410.9 mm # Rmin mm # 821.8/2=410.9 mm
+/gate/PETscanner/geometry/setHeight			    300 mm
+/gate/PETscanner/vis/setVisible                 0
+
+#	Level1 - RSector [1 rsector = 1 * 1 modules (trans * axial or Y * Z)]
+/gate/PETscanner/daughters/name			        rsector
+/gate/PETscanner/daughters/insert			    box
+/gate/rsector/placement/setTranslation			420.9 0.0 0.0 mm     # Rmin (half-trans FOV) + crystal_depth/2 (crystal center offset)    410.9 + 20/2 = 420.9
+/gate/rsector/geometry/setXLength			    20 mm                     # depth direction of crystal
+/gate/rsector/geometry/setYLength			    112.33 mm           # trans_module_size = 112.3 mm
+/gate/rsector/geometry/setZLength			    300 mm             # axial_module_size = 280.6 mm
+/gate/rsector/setMaterial				        Water
+/gate/rsector/vis/setVisible                    1
+/gate/rsector/vis/setColor				        red
+
+#	Level2 - Module (Panel) [1 module = 6 * 12 submodules (trans * axial or Y * Z)]
+/gate/rsector/daughters/name				    module
+/gate/rsector/daughters/insert				    box
+/gate/module/geometry/setXLength			    20 mm                     # depth direction of crystal
+/gate/module/geometry/setYLength			    112.33 mm             
+/gate/module/geometry/setZLength			    280.6 mm 
+/gate/module/setMaterial				        Water
+/gate/module/vis/setVisible                     1
+/gate/module/vis/forceSolid
+/gate/module/vis/setColor				        green
+
+#	Level3 - submodule  [1 submodule = 8 * 10 crystals (trans * axial or Y * Z)]
+/gate/module/daughters/name				        submodule                   
+/gate/module/daughters/insert				    box
+/gate/submodule/geometry/setXLength			    20 mm                     # depth direction of crystal
+/gate/submodule/geometry/setYLength			    112.33 mm     
+/gate/submodule/geometry/setZLength			    69.162 mm     
+/gate/submodule/setMaterial				        Water
+/gate/submodule/vis/setVisible                  1
+/gate/submodule/vis/forceWireframe
+/gate/submodule/vis/setColor				    yellow
+
+#	Level4 - block 
+/gate/submodule/daughters/name				        block                   
+/gate/submodule/daughters/insert				    box
+/gate/block/geometry/setXLength			            20 mm                     # depth direction of crystal
+/gate/block/geometry/setYLength			            18.2 mm     
+/gate/block/geometry/setZLength			            22.7 mm    
+/gate/block/setMaterial				                Water
+/gate/block/vis/forceWireframe
+/gate/block/vis/setColor				            white
+
+#	Level5 - Crystal Material Layer
+/gate/block/daughters/name				        crystal
+/gate/block/daughters/insert				    box
+/gate/crystal/placement/setTranslation	        0.0 0.0 0.0 mm
+/gate/crystal/geometry/setXLength			    20 mm
+/gate/crystal/geometry/setYLength			    2.05 mm
+/gate/crystal/geometry/setZLength			    2.05 mm
+/gate/crystal/setMaterial				        LYSO_TB
+/gate/crystal/vis/forceSolid   
+/gate/crystal/vis/setColor				        gray
+
+##########################################################
+#	Repeat the crystals, submodule, module, and rsector #
+##########################################################
+# Repeat Crystal
+/gate/crystal/repeaters/insert				    cubicArray
+/gate/crystal/cubicArray/setRepeatNumberX		1
+/gate/crystal/cubicArray/setRepeatNumberY		8
+/gate/crystal/cubicArray/setRepeatNumberZ		10
+/gate/crystal/cubicArray/setRepeatVector		0.0 2.25 2.25 mm              # cyrstal size 2.05mm, crystal gap 0.2mm.    2.25 = 2.05+0.2     
+
+# Repeat block 
+/gate/block/repeaters/insert			    cubicArray
+/gate/block/cubicArray/setRepeatNumberX		1
+/gate/block/cubicArray/setRepeatNumberY		6
+/gate/block/cubicArray/setRepeatNumberZ		3
+/gate/block/cubicArray/setRepeatVector		0.0 18.73 23.231 mm           # block size with edge [trans 18.2mm / axial 22.7mm], block gap [trans 0.53mm / axial 0.531mm]     18.2+0.53=18.73, 22.7+0.531=23.231
+
+# Repeat Submodule 
+/gate/submodule/repeaters/insert			    cubicArray
+/gate/submodule/cubicArray/setRepeatNumberX		1
+/gate/submodule/cubicArray/setRepeatNumberY		1
+/gate/submodule/cubicArray/setRepeatNumberZ		4
+/gate/submodule/cubicArray/setRepeatVector		0.0 113.328 70.16 mm       # submodule size with edge [trans 112.33 mm / axial 69.162 mm], submodule gap 0.998mm     112.33+0.998=113.328, 69.162+0.998=70.16
+
+# Repeat Module 
+/gate/module/repeaters/insert                    cubicArray
+/gate/module/cubicArray/setRepeatNumberX        1
+/gate/module/cubicArray/setRepeatNumberY        1
+/gate/module/cubicArray/setRepeatNumberZ        1
+/gate/module/cubicArray/setRepeatVector         0.0 0.0 285.6 mm           # module size with edge [trans 112.33 mm / axial 69.162 mm], module gap 0.998mm        280.6+5 = 285.6
+
+# Repeat RSector
+/gate/rsector/repeaters/insert				    ring
+/gate/rsector/ring/setRepeatNumber			    22
+
+######################
+#	Attach System #
+######################
+/gate/systems/PETscanner/level1/attach		rsector
+/gate/systems/PETscanner/level2/attach		module
+/gate/systems/PETscanner/level3/attach    	submodule
+/gate/systems/PETscanner/level4/attach		block
+/gate/systems/PETscanner/level5/attach		crystal
+
+/gate/crystal/attachCrystalSD
+
+#=====================================================
+#  P H A N T O M (扫描床与体模组件定义)
+#=====================================================
+
+/gate/world/daughters/name                    PatientBed
+/gate/world/daughters/insert                  box
+/gate/PatientBed/placement/setTranslation     0.0 -150.0 0.0 mm
+/gate/PatientBed/geometry/setXLength          400.0 mm
+/gate/PatientBed/geometry/setYLength          50.0 mm
+/gate/PatientBed/geometry/setZLength          300.0 mm
+/gate/PatientBed/setMaterial                  PMMA        # GateMaterials_newLYSO.db 中定义的 PMMA
+/gate/PatientBed/vis/setVisible               1
+/gate/PatientBed/vis/setColor                 blue
+/gate/PatientBed/vis/forceSolid
+
+/gate/PatientBed/attachPhantomSD
+
+####################### 
+
+/gate/world/daughters/name    NEMA_ImageQualityPhantom
+/gate/world/daughters/insert  ImageNestedParametrisedVolume
+
+/gate/NEMA_ImageQualityPhantom/geometry/setImage /share/home/xzhao/workDir/simulation/data/NEMA_IQ_phantom_material_labels_uint16.h33
+/gate/NEMA_ImageQualityPhantom/geometry/setRangeToMaterialFile /share/home/xzhao/workDir/simulation/data/PhantomRange_NEMA_IQP_260614.dat
+
+/gate/NEMA_ImageQualityPhantom/placement/setTranslation  0. 0. 0. mm
+/gate/NEMA_ImageQualityPhantom/placement/setRotationAxis 1 0 0
+/gate/NEMA_ImageQualityPhantom/placement/setRotationAngle 0 deg
+
+/gate/NEMA_ImageQualityPhantom/attachPhantomSD
+
+
+#=====================================================
+# PHYSICS CONFIGURATION (★必须移至内核初始化之前★)
+#=====================================================
+/gate/physics/addPhysicsList emlivermore_polar
+/gate/physics/addProcess RadioactiveDecay
+
+#=====================================================
+# INITIALISATION (★构建内核，将状态由 PreInit 转为 Idle)
+#=====================================================
+/gate/run/initialize
+
+#=====================================================
+#   D I G I T I Z E R (★必须在初始化完成之后执行)
+#===================================================== 
+/gate/digitizer/Singles/insert						adder         # adder to sum the hits generated per crystal
+/gate/digitizer/Singles/insert                  	readout
+/gate/digitizer/Singles/readout/setDepth			4             # depth=3, submodule (block) level
+
+###############################################   Energy Blurring
+/gate/digitizer/Singles/insert 											localBlurring
+/gate/digitizer/Singles/localBlurring/chooseNewVolume 					crystal
+/gate/digitizer/Singles/localBlurring/crystal/setResolution 			0.11
+/gate/digitizer/Singles/localBlurring/crystal/setEnergyOfReference 	    511. keV
+
+############################################## Energy setWindow
+/gate/digitizer/Singles/insert 											thresholder
+/gate/digitizer/Singles/thresholder/setThreshold						150.0 keV              # 250 keV
+/gate/digitizer/Singles/insert 											upholder
+/gate/digitizer/Singles/upholder/setUphold								700.0 keV              # 650 keV
+
+###################### Time Resolution
+/gate/digitizer/Singles/insert   timeResolution
+/gate/digitizer/Singles/timeResolution/setTimeResolution  176.7767 ps  # the measured coincidence time resolution is 250 ps
+
+#=====================================================
+#	C O I N C I D E N C E    S O R T E R
+#===================================================== 
+/gate/digitizer/Coincidences/setWindow	            6 ns
+/gate/digitizer/Coincidences/setOffset	            0. ns
+/gate/digitizer/Coincidences/MultiplesPolicy        takeAllGoods        # takeWinnerOfGoods
+/gate/digitizer/Coincidences/minSectorDifference    3
+/gate/digitizer/Coincidences/describe
+
+#=====================================================
+#  P A R T I C L E   S O U R C E (★处于 Idle 状态，开始加源)
+#=====================================================
+
+# Lu176 INTRINSIC RADIATION (晶体本底自激辐射源)
+/gate/source/addSource                                      Scintillator
+/gate/source/Scintillator/setActivity                       2811815.424 becquerel            # 总活度平均分配到confine的体积内 264 Bq/cm3
+/gate/source/Scintillator/gps/particle                      ion
+/gate/source/Scintillator/gps/ion                            71 176 0 0
+/gate/source/Scintillator/setForcedHalfLife                 1198700000000000000 s
+/gate/source/Scintillator/setForcedUnstableFlag             true
+/gate/source/Scintillator/gps/type                          Volume
+/gate/source/Scintillator/gps/shape                         Cylinder
+/gate/source/Scintillator/gps/radius                        450 mm
+/gate/source/Scintillator/gps/halfz                         150 mm
+/gate/source/Scintillator/gps/angtype                       iso
+/gate/source/Scintillator/gps/centre                        0.0 0.0 0.0 mm
+/gate/source/Scintillator/gps/confine                       crystal                   # confine求源和crystal物理体积的交集
+/gate/source/Scintillator/visualize                         5000 green 2
+
+#  NEMA IEC 2001 IQ SOURCE GAMMA (体模发射热源组件)
+
+/gate/source/addSource                                                                  NEMA_ImageQualityPhantom_source_noSphere voxel
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/reader/insert                              image
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/imageReader/translator/insert              range
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/imageReader/rangeTranslator/readTable      /share/home/xzhao/workDir/simulation/data/ActivityRange_NEMA_IQP_noSphere_260716.dat
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/imageReader/rangeTranslator/describe       1
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/imageReader/readFile                       /share/home/xzhao/workDir/simulation/data/NEMA_IQ_activity_labels_uint16.h33
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/imageReader/verbose                        1
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/setPosition                                -150 -115 -110 mm
+#/gate/source/NEMA_ImageQualityPhantom_source_noSphere/dump                                     1
+
+# THE FOLLOWING LINES CHARACTERIZE THE SIZE (NO DIFFERENCE WITH AN ANALYTICAL SOURCE)
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/setType                          backtoback
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/gps/particle                     gamma
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/gps/energytype                   Mono
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/gps/ene/mono                     0.511 MeV
+
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/gps/angtype iso
+
+/gate/source/NEMA_ImageQualityPhantom_source_noSphere/visualize 100 red 3
+
+
+
+
+
+/gate/source/list
+
+#=====================================================
+#  D A T A   O U T P U T   
+#=====================================================
+/gate/output/root/enable
+/gate/output/root/setFileName                         /data/zhaoxin/output_TBPET_1axial/TBPET_1axial_6p3p4_noDOI_IQP_w50mmBed_Lu176_phantomScan_voxelized_20260717_1
+/gate/output/root/setRootHitFlag                0
+/gate/output/root/setRootSinglesFlag            1
+/gate/output/root/setRootCoincidencesFlag       0
+
+/gate/verbose Physic    0
+/gate/verbose Cuts      0
+/gate/verbose SD        0
+/gate/verbose Actions   0
+/gate/verbose Actor     0
+/gate/verbose Step      0
+/gate/verbose Error     0
+/gate/verbose Warning   0
+/gate/verbose Output    0
+/gate/verbose Beam      0
+/gate/verbose Volume    0
+/gate/verbose Image     0
+/gate/verbose Geometry	0
+/gate/verbose Core      0
+
+/run/verbose 		1
+/event/verbose 		0
+/tracking/verbose	0      
+
+#====================================================
+#  R A N D O M   E N G I N E  A N D  S E E D
+#====================================================
+/gate/random/setEngineName      MersenneTwister
+/gate/random/setEngineSeed     11111
+/gate/random/verbose            1
+
+#=====================================================
+#   M E A S U R E M E N T   S E T T I N G S   
+#=====================================================
+/gate/application/setTimeSlice  900  s
+/gate/application/setTimeStart  0. s
+/gate/application/setTimeStop   900  s
+
+# LET'S RUN THE SIMULATION!
+/gate/application/startDAQ

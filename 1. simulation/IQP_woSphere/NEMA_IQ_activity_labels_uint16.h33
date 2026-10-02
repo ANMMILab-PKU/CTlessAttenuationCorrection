@@ -1,0 +1,20 @@
+!INTERFILE :=
+!GENERAL DATA :=
+!name of data file := /share/home/xzhao/workDir/simulation/data/NEMA_IQ_activity_labels_uint16.i33
+!GENERAL IMAGE DATA :=
+!type of data := Tomographic
+!total number of images := 220
+!matrix size [1] := 300
+!matrix size [2] := 230
+!matrix size [3] := 220
+!number of slices := 220
+!number format := unsigned integer
+!number of bytes per pixel := 2
+imagedata byte order := LITTLEENDIAN
+scaling factor (mm/pixel) [1] := 1.000000
+scaling factor (mm/pixel) [2] := 1.000000
+slice thickness (pixels) := 1.000000
+!data offset in bytes := 0
+!maximum pixel count := 38
+; labels are translated to Bq/voxel by ActivityRange.dat
+!END OF INTERFILE :=

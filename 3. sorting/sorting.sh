@@ -1,0 +1,3 @@
+
+./coincidence_sorter_withBackscatter_withConsist_OMP_26bitTime_260618 /share/home/xzhao/workDir/coin_sorter/sorter_20251021/root2dat/data/singles_TBPET_1axial_Lu176_phantomScan_IQP_w50mmBed_wSpheres_260729_0to900s.dat     ./setup_takeAll.config     coincidence_TBPET_1axial_6p3p4_noDOI_Lu176_phantomScan_IQP_w50mmBed_wSpheres_260729_0to900s
+

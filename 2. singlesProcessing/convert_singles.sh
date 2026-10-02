@@ -1,0 +1,3 @@
+
+./convert_dat4Sort_sortAfter_timeTagEnd_withEIandSIandCP_1axial_22panel   /share/home/xzhao/data_simulation/output_TBPET_1axial/  /share/home/xzhao/workDir/coin_sorter/sorter_20251021/root2dat/data/ singles_TBPET_1axial_Lu176_phantomScan_IQP_w50mmBed_260716_0to900s
+
